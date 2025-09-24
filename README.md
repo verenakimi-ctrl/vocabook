@@ -1,54 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VocaBook</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f5f5;
-      color: #333;
-      text-align: center;
-    }
-    header {
-      background: #6a5acd;
-      color: #fff;
-      padding: 20px;
-    }
-    h1 {
-      margin: 0;
-    }
-    main {
-      margin: 40px auto;
-      max-width: 600px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    p {
-      font-size: 18px;
-    }
-    footer {
-      margin-top: 40px;
-      padding: 10px;
-      background: #eee;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>📘 VocaBook</h1>
-  </header>
-  <main>
-    <p>Welcome to <strong>VocaBook</strong>!</p>
-    <p>This is your vocabulary learning & review app for the Pi Network ecosystem.</p>
-  </main>
-  <footer>
-    <p>© 2025 VocaBook. All rights reserved.</p>
-  </footer>
-</body>
-</html>
+# 📘 VocaBook
+
+VocaBook is a vocabulary learning & review app for the Pi Network ecosystem.
+
+---
+
+## ✨ Features
+- Look up meanings, part of speech, and examples  
+- Save studied words and review anytime  
+- Quick quiz mode (multiple choice / short answer)  
+
+---
+
+## 🛠 Tech Stack
+- Frontend: React/Next.js (or vanilla HTML for now)  
+- Hosting: Vercel  
+- Integration: Pi Network SDK (planned)  
+
+---
+
+## 🚀 Local Development
+```bash
+npm install
+npm run dev
