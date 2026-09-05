@@ -5,14 +5,15 @@ export default async function handler(req, res) {
 
   let paymentId = req.body?.paymentId;
   if (!paymentId && typeof req.body === 'string') {
-    try { paymentId = JSON.parse(req.body).paymentId; } catch (e) {}
+    try {
+      paymentId = JSON.parse(req.body).paymentId;
+    } catch (e) {}
   }
 
-  const apiKey = process.env.PI_API_KEY ? process.env.PI_API_KEY.trim() : null;
+  const apiKey = (process.env.PI_API_KEY || '').trim();
 
   if (!apiKey) {
-    console.error("오류: PI_API_KEY 환경변수가 설정되지 않았습니다.");
-    return res.status(500).json({ error: "API Key missing on Vercel" });
+    return res.status(500).json({ error: 'PI_API_KEY is not set' });
   }
 
   try {
@@ -21,15 +22,15 @@ export default async function handler(req, res) {
       headers: {
         'Authorization': `Key ${apiKey}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({})
     });
 
     const data = await response.json();
-    console.log("파이 서버 응답 결과:", response.status, data);
     return res.status(response.status).json(data);
   } catch (error) {
-    console.error("fetch 실패:", error);
     return res.status(500).json({ error: error.message });
   }
 }
+
 
