@@ -1,9 +1,10 @@
+
+// 1. Pi SDK 초기화
 Pi.init({ version: "2.0", sandbox: false });
 
 const scopes = ['username', 'payments', 'wallet_address'];
 
 function onIncompletePaymentFound(payment) {
-  console.log("미완료 결제 발견:", payment);
   if (payment && payment.identifier && payment.transaction && payment.transaction.txid) {
     fetch('/api/complete', {
       method: 'POST',
@@ -13,6 +14,22 @@ function onIncompletePaymentFound(payment) {
   }
 }
 
+// 2. 접속하자마자 5명 카운트에 반영되는 "파이 로그인 인증" 자동 실행
+window.addEventListener('DOMContentLoaded', () => {
+  Pi.authenticate(scopes, onIncompletePaymentFound)
+    .then((auth) => {
+      console.log("로그인 성공:", auth.user.username);
+      const statusEl = document.getElementById('loginStatus');
+      if (statusEl) {
+        statusEl.innerText = `접속 완료: ${auth.user.username}님 환영합니다!`;
+      }
+    })
+    .catch((err) => {
+      console.error("인증 실패:", err);
+    });
+});
+
+// 3. 결제는 버튼을 눌렀을 때만 작동
 function startPayment() {
   const paymentData = {
     amount: 0.01,
@@ -22,42 +39,27 @@ function startPayment() {
 
   const paymentCallbacks = {
     onReadyForServerApproval: function(paymentId) {
-      console.log("승인 요청 시작:", paymentId);
-      // 서버의 approve 응답이 끝날 때까지 반드시 return 대기해야 타임아웃이 나지 않습니다.
       return fetch('/api/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId })
-      })
-      .then(function(res) {
-        if (!res.ok) {
-          throw new Error("서버 승인 실패 (HTTP " + res.status + ")");
-        }
+      }).then(res => {
+        if (!res.ok) throw new Error("서버 승인 실패");
         return res.json();
-      })
-      .then(function(data) {
-        console.log("서버 승인 완료 데이터:", data);
       });
     },
     onReadyForServerCompletion: function(paymentId, txid) {
-      console.log("결제 완료 요청:", paymentId, txid);
       return fetch('/api/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: paymentId, txid: txid })
-      })
-      .then(function(res) {
-        return res.json();
-      })
-      .then(function(data) {
-        alert("결제가 정상적으로 완료되었습니다!");
-      });
+      }).then(res => res.json())
+        .then(() => alert("결제가 정상 완료되었습니다!"));
     },
     onCancel: function(paymentId) {
       console.log("결제 취소됨:", paymentId);
     },
-    onError: function(error, payment) {
-      console.error("결제 에러 발생:", error);
+    onError: function(error) {
       alert("결제 에러: " + (error.message || JSON.stringify(error)));
     }
   };
@@ -65,14 +67,9 @@ function startPayment() {
   Pi.createPayment(paymentData, paymentCallbacks);
 }
 
-document.getElementById('payBtn').addEventListener('click', function() {
-  Pi.authenticate(scopes, onIncompletePaymentFound)
-    .then(function(auth) {
-      startPayment();
-    })
-    .catch(function(error) {
-      alert("인증 오류: " + (error.message || JSON.stringify(error)));
-    });
-});
+const payBtn = document.getElementById('payBtn');
+if (payBtn) {
+  payBtn.addEventListener('click', startPayment);
+}
 
 
